@@ -3,100 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | H Levare Group</title>
+    <title>Panel Tecnológico | TukurForge Tech</title>
     <style>
         body {
             margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
-            background: #0f0f0f; color: white; text-align: center;
+            background: #0a0a0a; color: white; text-align: center;
         }
 
-        /* Cabecera del Holding */
         .header {
-            padding: 30px; background: #1a1a1a;
-            border-bottom: 2px solid #333; margin-bottom: 40px;
+            padding: 40px 20px; background: linear-gradient(180deg, #151515 0%, #0a0a0a 100%);
+            border-bottom: 1px solid #333;
         }
-        .holding-logo {
-            width: 120px; border-radius: 50%; border: 3px solid #ccc;
-            background: #f0f0f0; /* Fondo gris claro como pediste */
-        }
-        h1 { margin: 10px 0 5px; font-size: 1.5em; color: #fff; }
-        .user-welcome { color: #007bff; font-weight: bold; margin-bottom: 20px; }
+        
+        /* Logo TukurForge como principal */
+        .main-logo { width: 100px; border-radius: 10px; margin-bottom: 10px; }
+        
+        h1 { margin: 5px 0; font-size: 1.8em; letter-spacing: 1px; }
+        .slogan { color: #555; font-size: 0.9em; text-transform: uppercase; letter-spacing: 2px; }
+        .user-welcome { color: #007bff; font-weight: bold; margin-top: 15px; font-size: 1.1em; }
 
-        /* Contenedor de Divisiones */
         .grid-container {
-            display: flex; flex-wrap: wrap; justify-content: center;
-            gap: 30px; padding: 20px; max-width: 1000px; margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px; padding: 40px; max-width: 1200px; margin: 0 auto;
         }
 
         .card {
-            background: #1a1a1a; width: 260px; border-radius: 15px;
-            padding: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            transition: transform 0.3s; cursor: pointer;
-            border: 1px solid #333;
+            background: #151515; border-radius: 12px; padding: 25px;
+            border: 1px solid #222; transition: all 0.3s ease;
+            display: flex; flex-direction: column; align-items: center;
         }
-        .card:hover { transform: translateY(-10px); border-color: #007bff; }
+        .card:hover { transform: translateY(-8px); border-color: #007bff; box-shadow: 0 10px 30px rgba(0,123,255,0.2); }
 
         .card img {
-            width: 100%; height: 180px; object-fit: contain;
-            border-radius: 10px; margin-bottom: 15px;
+            width: 100%; height: 160px; object-fit: contain;
+            border-radius: 8px; margin-bottom: 20px;
         }
-
-        /* Ajustes específicos por logo */
+        
+        /* Estilos de fondo según logo */
         .bg-black { background: #000; }
-        .bg-white { background: #fff; }
+        .bg-white { background: #fff; padding: 5px; box-sizing: border-box; }
 
-        .card h3 { margin: 10px 0; font-size: 1.1em; }
-        .card p { font-size: 0.8em; color: #888; }
+        .card h3 { margin: 10px 0 5px; font-size: 1.2em; color: #fff; }
+        .card p { font-size: 0.85em; color: #666; margin-bottom: 20px; }
 
         .btn-access {
-            display: inline-block; margin-top: 15px; padding: 8px 20px;
-            background: #007bff; color: white; border-radius: 5px;
-            text-decoration: none; font-size: 0.9em;
+            width: 100%; padding: 10px; background: #007bff;
+            color: white; border-radius: 5px; text-decoration: none;
+            font-size: 0.9em; font-weight: bold; transition: 0.3s;
         }
+        .btn-access:hover { background: #0056b3; }
 
-        footer { margin-top: 50px; padding: 20px; color: #444; font-size: 0.7em; }
+        footer { margin-top: 60px; padding: 30px; border-top: 1px solid #222; color: #333; font-size: 0.75em; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <img class="holding-logo" src="https://echyplrboxmckxljtkgg.supabase.co/storage/v1/object/public/assets/H_Levare_Group/H_Levare_Group.jpeg" alt="H Levare Group">
-        <h1>H Levare Group</h1>
+        <img class="main-logo" src="https://echyplrboxmckxljtkgg.supabase.co/storage/v1/object/public/assets/TukurForge_Tech/TukurForge_Tech_Negro.jpeg" alt="TukurForge Tech">
+        <h1>TUKURFORGE TECH</h1>
+        <div class="slogan">Innovación a tu alcance</div>
         <div class="user-welcome" id="user-display">Bienvenido, Socio</div>
     </div>
 
     <div class="grid-container">
         
-        <div class="card" onclick="location.href='#'">
-            <img class="bg-black" src="https://echyplrboxmckxljtkgg.supabase.co/storage/v1/object/public/assets/TukurForge_Tech/TukurForge_Tech_Negro.jpeg" alt="TukurForge Tech">
-            <h3>TukurForge Tech</h3>
-            <p>Infraestructura & Desarrollo</p>
-            <span class="btn-access">Gestionar</span>
-        </div>
-
-        <div class="card" onclick="location.href='#'">
+        <div class="card">
             <img class="bg-white" src="https://echyplrboxmckxljtkgg.supabase.co/storage/v1/object/public/assets/Tukur_Edu/Tukur_Edu.jpeg" alt="Tukur-Edu">
             <h3>Tukur-Edu</h3>
-            <p>Simuladores IA con Supervisión</p>
-            <span class="btn-access">Panel de Control</span>
+            <p>Gestión Educativa</p>
+            <a href="#" class="btn-access">ENTRAR</a>
         </div>
 
-        <div class="card" onclick="location.href='#'">
+        <div class="card">
+            <img class="bg-black" src="https://echyplrboxmckxljtkgg.supabase.co/storage/v1/object/public/assets/TukurForge_Tech/TukurForge_Tech_Negro.jpeg" alt="SimuTukur">
+            <h3>SimuTukur</h3>
+            <p>Simulador de Examen en Línea</p>
+            <a href="#" class="btn-access">ENTRAR</a>
+        </div>
+
+        <div class="card">
             <img class="bg-black" src="https://echyplrboxmckxljtkgg.supabase.co/storage/v1/object/public/assets/Forja_Gym/Forja_Gym.jpeg" alt="Forja Gym">
             <h3>Forja Gym</h3>
-            <p>SaaS de Gestión Fitness</p>
-            <span class="btn-access">Administrar</span>
+            <p>Gestión Fitness</p>
+            <a href="#" class="btn-access">ENTRAR</a>
         </div>
 
     </div>
 
     <footer>
-        &copy; 2026 H Levare Group Corporativo. Todos los derechos reservados.<br>
-        Potenciado por TukurForge Tech.
+        &copy; 2026 TukurForge Tech | Una división de H Levare Group.<br>
+        Hecho con IA para forjar el futuro.
     </footer>
 
     <script>
-        // Recuperar nombre del usuario logueado
         const userName = localStorage.getItem('user_name');
         if (userName) {
             document.getElementById('user-display').innerText = `Bienvenido, ${userName}`;
