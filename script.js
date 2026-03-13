@@ -10,14 +10,12 @@ const message = document.getElementById('message');
 const togglePassword = document.getElementById('togglePassword');
 const passwordInput = document.getElementById('password');
 
-// 1. Lógica para ver/ocultar contraseña
 togglePassword.addEventListener('click', () => {
     const isPassword = passwordInput.type === 'password';
     passwordInput.type = isPassword ? 'text' : 'password';
     togglePassword.textContent = isPassword ? '🔒' : '👁️';
 });
 
-// 2. Lógica de Login
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const userLogin = document.getElementById('user-login').value;
@@ -27,7 +25,8 @@ loginForm.addEventListener('submit', async (e) => {
     message.innerText = 'Verificando...';
 
     try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/Usuarios?Usuario_Login=eq.${userLogin}&Password=eq.${pass}&select=*,Negocio(*)`, {
+        // CORRECCIÓN AQUÍ: usuario_login y password en minúsculas para que coincida con tu tabla
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/usuarios?usuario_login=eq.${userLogin}&password=eq.${pass}&select=*,negocio(*)`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
 
@@ -36,12 +35,11 @@ loginForm.addEventListener('submit', async (e) => {
         if (data.length > 0) {
             const usuario = data[0];
             
-            // Actualizar logo antes de la transición
-            if (usuario.Negocio && usuario.Negocio.Logo_Empresa) {
-                brandLogo.src = usuario.Negocio.Logo_Empresa;
+            // Ajustamos también estos campos a minúsculas como están en tu DB
+            if (usuario.negocio && usuario.negocio.logo_empresa) {
+                brandLogo.src = usuario.negocio.logo_empresa;
             }
 
-            // Animación de salida y video
             loginBox.classList.add('fade-out');
             
             setTimeout(() => {
@@ -51,15 +49,13 @@ loginForm.addEventListener('submit', async (e) => {
             }, 500);
 
             splashVideo.onended = () => {
-                alert(`¡Bienvenido, ${usuario.Nombre_Completo}!`);
-                // Aquí irá la redirección futura
+                alert(`¡Bienvenido, ${usuario.nombre_completo}!`);
             };
 
         } else {
-            // Error si no coincide usuario/pass
             message.style.color = '#ff4d4d';
             message.innerText = '❌ Usuario o contraseña incorrectos';
-            passwordInput.value = ''; // Limpiar pass por seguridad
+            passwordInput.value = '';
         }
     } catch (error) {
         message.style.color = '#ff4d4d';
