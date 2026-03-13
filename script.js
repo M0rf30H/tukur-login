@@ -22,23 +22,27 @@ loginForm.addEventListener('submit', async (e) => {
     const pass = passwordInput.value;
 
     message.style.color = 'white';
-    message.innerText = 'Verificando...';
+    message.innerText = 'Verificando en TukurForge...';
 
     try {
-        // CORRECCIÓN AQUÍ: usuario_login y password en minúsculas para que coincida con tu tabla
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/usuarios?usuario_login=eq.${userLogin}&password=eq.${pass}&select=*,negocio(*)`, {
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        const url = `${SUPABASE_URL}/rest/v1/usuarios?usuario_login=eq.${userLogin}&password=eq.${pass}&select=*`;
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: { 
+                'apikey': SUPABASE_KEY, 
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            }
         });
 
         const data = await response.json();
 
-        if (data.length > 0) {
+        if (data && data.length > 0) {
             const usuario = data[0];
-            
-            // Ajustamos también estos campos a minúsculas como están en tu DB
-            if (usuario.negocio && usuario.negocio.logo_empresa) {
-                brandLogo.src = usuario.negocio.logo_empresa;
-            }
+            message.style.color = '#00ff00';
+            message.innerText = '✅ Credenciales correctas';
 
             loginBox.classList.add('fade-out');
             
@@ -51,14 +55,12 @@ loginForm.addEventListener('submit', async (e) => {
             splashVideo.onended = () => {
                 alert(`¡Bienvenido, ${usuario.nombre_completo}!`);
             };
-
         } else {
             message.style.color = '#ff4d4d';
-            message.innerText = '❌ Usuario o contraseña incorrectos';
-            passwordInput.value = '';
+            message.innerText = '❌ Error: Datos incorrectos';
         }
     } catch (error) {
-        message.style.color = '#ff4d4d';
-        message.innerText = '⚠️ Error de conexión con TukurForge';
+        console.error("Error de socio:", error);
+        message.innerText = '⚠️ Error de red. Revisa tu conexión.';
     }
 });
