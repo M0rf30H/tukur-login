@@ -5,24 +5,17 @@ const loginForm = document.getElementById('login-form');
 const loginBox = document.getElementById('login-box');
 const splashScreen = document.getElementById('splash-screen');
 const splashVideo = document.getElementById('splash-video');
-const brandLogo = document.getElementById('brand-logo');
 const message = document.getElementById('message');
-const togglePassword = document.getElementById('togglePassword');
 const passwordInput = document.getElementById('password');
-
-togglePassword.addEventListener('click', () => {
-    const isPassword = passwordInput.type === 'password';
-    passwordInput.type = isPassword ? 'text' : 'password';
-    togglePassword.textContent = isPassword ? '🔒' : '👁️';
-});
 
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const userLogin = document.getElementById('user-login').value;
-    const pass = passwordInput.value;
+    // .trim() elimina espacios accidentales que metas al copiar/pegar
+    const userLogin = document.getElementById('user-login').value.trim();
+    const pass = passwordInput.value.trim();
 
     message.style.color = 'white';
-    message.innerText = 'Verificando en TukurForge...';
+    message.innerText = 'Conectando con TukurForge...';
 
     try {
         const url = `${SUPABASE_URL}/rest/v1/usuarios?usuario_login=eq.${userLogin}&password=eq.${pass}&select=*`;
@@ -31,36 +24,31 @@ loginForm.addEventListener('submit', async (e) => {
             method: 'GET',
             headers: { 
                 'apikey': SUPABASE_KEY, 
-                'Authorization': `Bearer ${SUPABASE_KEY}`,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=representation'
+                'Authorization': `Bearer ${SUPABASE_KEY}`
             }
         });
 
         const data = await response.json();
 
+        // LOG PARA SOCIOS: Si esto falla, presiona F12 en tu página y dime qué sale en "Console"
+        console.log("Respuesta de Supabase:", data);
+
         if (data && data.length > 0) {
-            const usuario = data[0];
             message.style.color = '#00ff00';
-            message.innerText = '✅ Credenciales correctas';
+            message.innerText = '✅ Acceso correcto';
 
             loginBox.classList.add('fade-out');
-            
             setTimeout(() => {
                 loginBox.classList.add('hidden');
                 splashScreen.classList.remove('hidden');
-                splashVideo.play();
+                splashVideo.play().catch(err => console.error("Error video:", err));
             }, 500);
-
-            splashVideo.onended = () => {
-                alert(`¡Bienvenido, ${usuario.nombre_completo}!`);
-            };
         } else {
             message.style.color = '#ff4d4d';
             message.innerText = '❌ Error: Datos incorrectos';
         }
     } catch (error) {
-        console.error("Error de socio:", error);
-        message.innerText = '⚠️ Error de red. Revisa tu conexión.';
+        console.error("Error técnico:", error);
+        message.innerText = '⚠️ Error de red o base de datos.';
     }
 });
