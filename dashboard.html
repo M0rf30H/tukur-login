@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | H Levare Group</title>
+    <style>
+        body {
+            margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif;
+            background: #0f0f0f; color: white; text-align: center;
+        }
+
+        /* Cabecera del Holding */
+        .header {
+            padding: 30px; background: #1a1a1a;
+            border-bottom: 2px solid #333; margin-bottom: 40px;
+        }
+        .holding-logo {
+            width: 120px; border-radius: 50%; border: 3px solid #ccc;
+            background: #f0f0f0; /* Fondo gris claro como pediste */
+        }
+        h1 { margin: 10px 0 5px; font-size: 1.5em; color: #fff; }
+        .user-welcome { color: #007bff; font-weight: bold; margin-bottom: 20px; }
+
+        /* Contenedor de Divisiones */
+        .grid-container {
+            display: flex; flex-wrap: wrap; justify-content: center;
+            gap: 30px; padding: 20px; max-width: 1000px; margin: 0 auto;
+        }
+
+        .card {
+            background: #1a1a1a; width: 260px; border-radius: 15px;
+            padding: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            transition: transform 0.3s; cursor: pointer;
+            border: 1px solid #333;
+        }
+        .card:hover { transform: translateY(-10px); border-color: #007bff; }
+
+        .card img {
+            width: 100%; height: 180px; object-fit: contain;
+            border-radius: 10px; margin-bottom: 15px;
+        }
+
+        /* Ajustes específicos por logo */
+        .bg-black { background: #000; }
+        .bg-white { background: #fff; }
+
+        .card h3 { margin: 10px 0; font-size: 1.1em; }
+        .card p { font-size: 0.8em; color: #888; }
+
+        .btn-access {
+            display: inline-block; margin-top: 15px; padding: 8px 20px;
+            background: #007bff; color: white; border-radius: 5px;
+            text-decoration: none; font-size: 0.9em;
+        }
+
+        footer { margin-top: 50px; padding: 20px; color: #444; font-size: 0.7em; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img class="holding-logo" src="https://echyplrboxmckxljtkgg.supabase.co/storage/v1/object/public/assets/H_Levare_Group/H_Levare_Group.jpeg" alt="H Levare Group">
+        <h1>H Levare Group</h1>
+        <div class="user-welcome" id="user-display">Bienvenido, Socio</div>
+    </div>
+
+    <div class="grid-container">
+        
+        <div class="card" onclick="location.href='#'">
+            <img class="bg-black" src="https://echyplrboxmckxljtkgg.supabase.co/storage/v1/object/public/assets/TukurForge_Tech/TukurForge_Tech_Negro.jpeg" alt="TukurForge Tech">
+            <h3>TukurForge Tech</h3>
+            <p>Infraestructura & Desarrollo</p>
+            <span class="btn-access">Gestionar</span>
+        </div>
+
+        <div class="card" onclick="location.href='#'">
+            <img class="bg-white" src="https://echyplrboxmckxljtkgg.supabase.co/storage/v1/object/public/assets/Tukur_Edu/Tukur_Edu.jpeg" alt="Tukur-Edu">
+            <h3>Tukur-Edu</h3>
+            <p>Simuladores IA con Supervisión</p>
+            <span class="btn-access">Panel de Control</span>
+        </div>
+
+        <div class="card" onclick="location.href='#'">
+            <img class="bg-black" src="https://echyplrboxmckxljtkgg.supabase.co/storage/v1/object/public/assets/Forja_Gym/Forja_Gym.jpeg" alt="Forja Gym">
+            <h3>Forja Gym</h3>
+            <p>SaaS de Gestión Fitness</p>
+            <span class="btn-access">Administrar</span>
+        </div>
+
+    </div>
+
+    <footer>
+        &copy; 2026 H Levare Group Corporativo. Todos los derechos reservados.<br>
+        Potenciado por TukurForge Tech.
+    </footer>
+
+    <script>
+        // Recuperar nombre del usuario logueado
+        const userName = localStorage.getItem('user_name');
+        if (userName) {
+            document.getElementById('user-display').innerText = `Bienvenido, ${userName}`;
+        }
+    </script>
+</body>
+</html>
