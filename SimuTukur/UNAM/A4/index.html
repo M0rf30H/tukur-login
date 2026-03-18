@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimuTukur | Área 4 - UNAM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen font-sans">
+
+    <header class="p-4 bg-slate-800 border-b border-yellow-600/30 flex justify-between items-center shadow-lg">
+        <div>
+            <h1 class="text-2xl font-bold text-yellow-500 tracking-wider">SimuTukur ⚜️</h1>
+            <p class="text-[10px] text-slate-400 uppercase tracking-widest">Powered by TukurForge Tech</p>
+        </div>
+        <div class="text-right">
+            <span id="timer" class="text-xl font-mono text-red-400">03:00:00</span>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-6 mt-8">
+        <div id="quiz-card" class="bg-slate-800 rounded-2xl p-8 border border-slate-700 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <span id="badge-materia" class="bg-yellow-600/20 text-yellow-500 text-xs font-bold px-3 py-1 rounded-full border border-yellow-600/50">LITERATURA</span>
+                <span id="txt-nivel" class="text-slate-400 text-sm italic">Nivel: Iniciando</span>
+            </div>
+
+            <h2 id="txt-pregunta" class="text-2xl font-medium mb-8 leading-relaxed">
+                Cargando el examen desde el servidor...
+            </h2>
+
+            <div id="opciones-grid" class="grid grid-cols-1 gap-4">
+                </div>
+
+            <div class="mt-10 flex justify-between items-center border-t border-slate-700 pt-6">
+                <p class="text-slate-500 text-sm">Pregunta <span id="current-number">1</span> de 120</p>
+                <button id="btn-next" onclick="nextQuestion()" class="hidden bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-bold py-3 px-8 rounded-xl transition-all transform hover:scale-105">
+                    Siguiente Pregunta
+                </button>
+            </div>
+        </div>
+
+        <div id="ia-box" class="hidden mt-6 bg-blue-900/20 border border-blue-500/30 p-5 rounded-xl flex items-start gap-4">
+            <div class="text-2xl">🧠</div>
+            <div>
+                <p class="text-blue-400 font-bold text-sm">Socio Tutor IA:</p>
+                <p id="ia-feedback" class="text-blue-100 text-sm mt-1 leading-relaxed"></p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // CONFIGURACIÓN: Aquí pegas los datos de la imagen de Supabase que me mostraste
+        const SUPABASE_URL = "TU_PROJECT_URL";
+        const SUPABASE_KEY = "TU_ANON_PUBLIC_KEY";
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentQuestion = null;
+
+        async function fetchQuestion() {
+            // Aquí la IA selecciona la pregunta según el nivel del alumno
+            const { data, error } = await supabase
+                .from('reactivos_a4')
+                .select('*')
+                .limit(1)
+                .single();
+
+            if (data) {
+                currentQuestion = data;
+                renderQuestion(data);
+            }
+        }
+
+        function renderQuestion(q) {
+            document.getElementById('txt-pregunta').innerText = q.pregunta;
+            document.getElementById('badge-materia').innerText = q.materia.toUpperCase();
+            document.getElementById('txt-nivel').innerText = `Nivel: ${q.nivel === 1 ? 'Iniciando' : q.nivel === 2 ? 'Intermedio' : 'Examen'}`;
+            
+            const grid = document.getElementById('opciones-grid');
+            grid.innerHTML = '';
+
+            Object.entries(q.opciones).forEach(([letra, texto]) => {
+                const btn = document.createElement('button');
+                btn.className = "group flex items-center p-4 bg-slate-700/50 border border-slate-600 rounded-xl hover:border-yellow-500 hover:bg-slate-700 transition-all text-left";
+                btn.innerHTML = `
+                    <span class="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-800 text-yellow-500 font-bold mr-4 group-hover:bg-yellow-500 group-hover:text-slate-900">${letra}</span>
+                    <span class="flex-1">${texto}</span>
+                `;
+                btn.onclick = () => checkAnswer(letra);
+                grid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(choice) {
+            const iaBox = document.getElementById('ia-box');
+            const iaMsg = document.getElementById('ia-feedback');
+            const btnNext = document.getElementById('btn-next');
+
+            iaBox.classList.remove('hidden');
+            btnNext.classList.remove('hidden');
+
+            if (choice === currentQuestion.respuesta_correcta) {
+                iaMsg.innerText = "¡Correcto! " + currentQuestion.explicacion_ia;
+            } else {
+                iaMsg.innerText = "No es correcto. " + currentQuestion.explicacion_ia;
+            }
+            // Aquí se enviaría el análisis a la tabla de resultados para el papá
+        }
+
+        fetchQuestion();
+    </script>
+</body>
+</html>
