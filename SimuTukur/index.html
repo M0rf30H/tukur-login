@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimuTukur | Examen Multi-Área</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen font-sans flex flex-col md:flex-row">
+
+    <aside class="w-full md:w-80 bg-slate-800 p-6 border-r border-slate-700 flex flex-col items-center gap-6">
+        <div class="text-center w-full">
+            <h1 class="text-2xl font-bold text-yellow-500 tracking-wider">SimuTukur ⚜️</h1>
+            <p class="text-[10px] text-slate-400 uppercase tracking-widest">Powered by TukurForge Tech</p>
+        </div>
+
+        <div class="w-full aspect-video bg-black rounded-xl overflow-hidden border-2 border-yellow-600/30 relative">
+            <video id="webcam" autoplay muted class="w-full h-full object-cover grayscale opacity-70"></video>
+            <div class="absolute top-2 right-2 flex items-center gap-1">
+                <div id="rec-dot" class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                <span class="text-[8px] font-bold text-red-500">REC</span>
+            </div>
+            <canvas id="photo-canvas" class="hidden"></canvas>
+        </div>
+
+        <div class="w-full bg-slate-900 p-3 rounded-lg border border-slate-700">
+            <p class="text-[10px] text-slate-500 uppercase font-bold mb-2">Monitor de Audio</p>
+            <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                <div id="audio-bar" class="h-full bg-green-500 w-0 transition-all duration-150"></div>
+            </div>
+        </div>
+
+        <div class="w-full p-4 bg-slate-900 rounded-xl text-center border border-yellow-600/20">
+            <span id="timer" class="text-3xl font-mono text-yellow-500">03:00:00</span>
+            <p class="text-[10px] text-slate-500 uppercase mt-1">Tiempo Restante</p>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-4 md:p-10">
+        <div id="quiz-card" class="max-w-3xl mx-auto bg-slate-800 rounded-2xl p-8 border border-slate-700 shadow-2xl relative">
+            
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex gap-2">
+                    <span id="badge-materia" class="bg-yellow-600/20 text-yellow-500 text-[10px] font-bold px-3 py-1 rounded-full border border-yellow-600/50">CARGANDO...</span>
+                    <span id="badge-area" class="bg-indigo-600/20 text-indigo-400 text-[10px] font-bold px-3 py-1 rounded-full border border-indigo-600/50">UNAM</span>
+                </div>
+                <span id="txt-nivel" class="text-slate-500 text-xs italic">Nivel: ---</span>
+            </div>
+
+            <h2 id="txt-pregunta" class="text-2xl font-medium mb-8 leading-relaxed text-slate-100">
+                Preparando tu sesión de entrenamiento...
+            </h2>
+
+            <div id="opciones-grid" class="grid grid-cols-1 gap-4">
+                </div>
+
+            <div id="ia-box" class="hidden mt-8 bg-blue-900/20 border border-blue-500/30 p-5 rounded-xl flex items-start gap-4">
+                <div class="text-2xl">🧠</div>
+                <div>
+                    <p class="text-blue-400 font-bold text-xs">Socio Tutor IA:</p>
+                    <p id="ia-feedback" class="text-blue-100 text-sm mt-1 leading-relaxed"></p>
+                </div>
+            </div>
+
+            <div class="mt-10 flex justify-between items-center border-t border-slate-700 pt-6">
+                <p class="text-slate-500 text-sm font-mono">Pregunta <span id="current-count">0</span>/120</p>
+                <button id="btn-next" onclick="fetchNextQuestion()" class="hidden bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-extrabold py-3 px-10 rounded-xl transition-all shadow-lg">
+                    SIGUIENTE
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 1. CONFIGURACIÓN (Usa tus datos de la captura anterior)
+        const SUPABASE_URL = "https://pcuopqvmucmhtcdeswxh.supabase.co";
+        const SUPABASE_KEY = "TU_ANON_PUBLIC_KEY"; // Pega aquí tu Anon Key
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentQuestion = null;
+        let count = 0;
+
+        // 2. INICIAR CÁMARA Y AUDIO
+        async function initMedia() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                document.getElementById('webcam').srcObject = stream;
+                
+                // Monitor simple de audio
+                const audioCtx = new AudioContext();
+                const source = audioCtx.createMediaStreamSource(stream);
+                const analyser = audioCtx.createAnalyser();
+                source.connect(analyser);
+                
+                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+                function updateAudio() {
+                    analyser.getByteFrequencyData(dataArray);
+                    const avg = dataArray.reduce((a,b) => a+b) / dataArray.length;
+                    document.getElementById('audio-bar').style.width = Math.min(avg * 2, 100) + "%";
+                    requestAnimationFrame(updateAudio);
+                }
+                updateAudio();
+            } catch (err) {
+                console.warn("Permiso de cámara/audio denegado socio.");
+            }
+        }
+
+        // 3. CAPTURA AUTOMÁTICA DE EVIDENCIA (Cada 5 min)
+        function autoCapture() {
+            const video = document.getElementById('webcam');
+            const canvas = document.getElementById('photo-canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            console.log("📸 Evidencia tomada para el reporte del socio.");
+        }
+        setInterval(autoCapture, 300000); 
+
+        // 4. LÓGICA DE PREGUNTAS
+        async function fetchNextQuestion() {
+            document.getElementById('ia-box').classList.add('hidden');
+            document.getElementById('btn-next').classList.add('hidden');
+            
+            // Aquí filtramos dinámicamente. Puedes cambiar 'A4' por una variable según el usuario.
+            const { data, error } = await _supabase
+                .from('reactivos')
+                .select('*')
+                .eq('institucion', 'UNAM')
+                .eq('tipo_examen', 'A4') // Esto lo hará dinámico después
+                .order('id', { ascending: false })
+                .limit(10); // Traemos varios para sortear
+
+            if (data && data.length > 0) {
+                const randomQ = data[Math.floor(Math.random() * data.length)];
+                currentQuestion = randomQ;
+                count++;
+                render(randomQ);
+            }
+        }
+
+        function render(q) {
+            document.getElementById('txt-pregunta').innerText = q.pregunta;
+            document.getElementById('badge-materia').innerText = q.materia.toUpperCase();
+            document.getElementById('badge-area').innerText = q.tipo_examen;
+            document.getElementById('current-count').innerText = count;
+            
+            const grid = document.getElementById('opciones-grid');
+            grid.innerHTML = '';
+
+            Object.entries(q.opciones).forEach(([letra, texto]) => {
+                const btn = document.createElement('button');
+                btn.className = "group flex items-center p-4 bg-slate-700/30 border border-slate-600 rounded-xl hover:border-yellow-500 hover:bg-slate-700 transition-all text-left";
+                btn.innerHTML = `
+                    <span class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-900 text-yellow-500 font-bold mr-4 group-hover:bg-yellow-500 group-hover:text-slate-900">${letra}</span>
+                    <span class="text-sm">${texto}</span>
+                `;
+                btn.onclick = () => check(letra);
+                grid.appendChild(btn);
+            });
+        }
+
+        function check(choice) {
+            const iaBox = document.getElementById('ia-box');
+            const iaMsg = document.getElementById('ia-feedback');
+            iaBox.classList.remove('hidden');
+            document.getElementById('btn-next').classList.remove('hidden');
+
+            if (choice === currentQuestion.respuesta_correcta) {
+                iaMsg.innerHTML = `<b class="text-green-400">¡Excelente elección!</b> ${currentQuestion.explicacion_ia}`;
+            } else {
+                iaMsg.innerHTML = `<b class="text-red-400">Ojo aquí socio:</b> La respuesta era ${currentQuestion.respuesta_correcta}. ${currentQuestion.explicacion_ia}`;
+            }
+        }
+
+        // Arrancar todo
+        initMedia();
+        fetchNextQuestion();
+    </script>
+</body>
+</html>
