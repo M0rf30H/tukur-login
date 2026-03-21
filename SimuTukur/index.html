@@ -3,31 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SimuTukur | Examen Multi-Área</title>
+    <title>SimuTukur | UNAM Área 4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Pantalla de Carga con tu Logo MP4/GIF */
+        #loader {
+            position: fixed; inset: 0; background: #0f172a; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100;
+        }
+        .logo-animado { width: 200px; margin-bottom: 20px; }
+    </style>
 </head>
 <body class="bg-slate-900 text-white min-h-screen font-sans flex flex-col md:flex-row">
 
+    <div id="loader">
+        <img src="TU_LOGO_ANIMADO.gif" class="logo-animado" alt="Cargando...">
+        <p class="text-yellow-500 font-mono animate-pulse">PREPARANDO ENTORNO SEGURO...</p>
+    </div>
+
     <aside class="w-full md:w-80 bg-slate-800 p-6 border-r border-slate-700 flex flex-col items-center gap-6">
         <div class="text-center w-full">
+            <img src="TU_LOGO_ESTATICO.png" alt="SimuTukur" class="w-20 mx-auto mb-2">
             <h1 class="text-2xl font-bold text-yellow-500 tracking-wider">SimuTukur ⚜️</h1>
-            <p class="text-[10px] text-slate-400 uppercase tracking-widest">Powered by TukurForge Tech</p>
+            <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">UNAM ÁREA 4</p>
         </div>
 
-        <div class="w-full aspect-video bg-black rounded-xl overflow-hidden border-2 border-yellow-600/30 relative">
-            <video id="webcam" autoplay muted class="w-full h-full object-cover grayscale opacity-70"></video>
+        <div class="w-full aspect-video bg-black rounded-xl overflow-hidden border-2 border-red-600/50 relative">
+            <video id="webcam" autoplay muted class="w-full h-full object-cover"></video>
             <div class="absolute top-2 right-2 flex items-center gap-1">
-                <div id="rec-dot" class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                <span class="text-[8px] font-bold text-red-500">REC</span>
-            </div>
-            <canvas id="photo-canvas" class="hidden"></canvas>
-        </div>
-
-        <div class="w-full bg-slate-900 p-3 rounded-lg border border-slate-700">
-            <p class="text-[10px] text-slate-500 uppercase font-bold mb-2">Monitor de Audio</p>
-            <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
-                <div id="audio-bar" class="h-full bg-green-500 w-0 transition-all duration-150"></div>
+                <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                <span class="text-[8px] font-bold text-red-500">SUPERVISIÓN ACTIVA</span>
             </div>
         </div>
 
@@ -35,6 +41,10 @@
             <span id="timer" class="text-3xl font-mono text-yellow-500">03:00:00</span>
             <p class="text-[10px] text-slate-500 uppercase mt-1">Tiempo Restante</p>
         </div>
+
+        <button onclick="abortarExamen()" class="w-full py-2 bg-red-900/30 text-red-500 border border-red-500/50 rounded-lg text-xs font-bold hover:bg-red-500 hover:text-white transition-all">
+            ABORTAR EXAMEN
+        </button>
     </aside>
 
     <main class="flex-1 p-4 md:p-10">
@@ -43,29 +53,20 @@
             <div class="flex justify-between items-center mb-6">
                 <div class="flex gap-2">
                     <span id="badge-materia" class="bg-yellow-600/20 text-yellow-500 text-[10px] font-bold px-3 py-1 rounded-full border border-yellow-600/50">CARGANDO...</span>
-                    <span id="badge-area" class="bg-indigo-600/20 text-indigo-400 text-[10px] font-bold px-3 py-1 rounded-full border border-indigo-600/50">UNAM</span>
+                    <span class="bg-indigo-600/20 text-indigo-400 text-[10px] font-bold px-3 py-1 rounded-full border border-indigo-600/50">UNAM ÁREA 4</span>
                 </div>
-                <span id="txt-nivel" class="text-slate-500 text-xs italic">Nivel: ---</span>
+                <span class="text-slate-500 text-xs italic">Nivel: Principiante</span>
             </div>
 
-            <h2 id="txt-pregunta" class="text-2xl font-medium mb-8 leading-relaxed text-slate-100">
-                Preparando tu sesión de entrenamiento...
+            <h2 id="txt-pregunta" class="text-2xl font-medium mb-8 leading-relaxed text-slate-100 italic">
+                Cargando reactivo...
             </h2>
 
-            <div id="opciones-grid" class="grid grid-cols-1 gap-4">
-                </div>
-
-            <div id="ia-box" class="hidden mt-8 bg-blue-900/20 border border-blue-500/30 p-5 rounded-xl flex items-start gap-4">
-                <div class="text-2xl">🧠</div>
-                <div>
-                    <p class="text-blue-400 font-bold text-xs">Socio Tutor IA:</p>
-                    <p id="ia-feedback" class="text-blue-100 text-sm mt-1 leading-relaxed"></p>
-                </div>
-            </div>
+            <div id="opciones-grid" class="grid grid-cols-1 gap-4"></div>
 
             <div class="mt-10 flex justify-between items-center border-t border-slate-700 pt-6">
                 <p class="text-slate-500 text-sm font-mono">Pregunta <span id="current-count">0</span>/120</p>
-                <button id="btn-next" onclick="fetchNextQuestion()" class="hidden bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-extrabold py-3 px-10 rounded-xl transition-all shadow-lg">
+                <button id="btn-next" onclick="fetchNextQuestion()" class="hidden bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-extrabold py-3 px-10 rounded-xl transition-all">
                     SIGUIENTE
                 </button>
             </div>
@@ -73,109 +74,95 @@
     </main>
 
     <script>
-        // 1. CONFIGURACIÓN (Usa tus datos de la captura anterior)
         const SUPABASE_URL = "https://pcuopqvmucmhtcdeswxh.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBjdW9wcXZtdWNtaHRjZGVzd3hoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM4NTk0NTgsImV4cCI6MjA4OTQzNTQ1OH0.g1xfdTtbz4aNW_QF_JcwoM7DCmgRLDxF2Ik48I7fq2M"; // Pega aquí tu Anon Key
+        const SUPABASE_KEY = "TU_ANON_KEY"; 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let currentQuestion = null;
-        let count = 0;
+        let questionsBank = [];
+        let currentIndex = 0;
+        let timeLeft = 3 * 60 * 60; // 3 horas
 
-        // 2. INICIAR CÁMARA Y AUDIO
-        async function initMedia() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                document.getElementById('webcam').srcObject = stream;
-                
-                // Monitor simple de audio
-                const audioCtx = new AudioContext();
-                const source = audioCtx.createMediaStreamSource(stream);
-                const analyser = audioCtx.createAnalyser();
-                source.connect(analyser);
-                
-                const dataArray = new Uint8Array(analyser.frequencyBinCount);
-                function updateAudio() {
-                    analyser.getByteFrequencyData(dataArray);
-                    const avg = dataArray.reduce((a,b) => a+b) / dataArray.length;
-                    document.getElementById('audio-bar').style.width = Math.min(avg * 2, 100) + "%";
-                    requestAnimationFrame(updateAudio);
+        // 1. CONTROL DEL TIEMPO
+        function startTimer() {
+            const timerElement = document.getElementById('timer');
+            const interval = setInterval(() => {
+                const h = Math.floor(timeLeft / 3600);
+                const m = Math.floor((timeLeft % 3600) / 60);
+                const s = timeLeft % 60;
+                timerElement.innerText = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    alert("Tiempo agotado socio.");
+                    finalizarExamen();
                 }
-                updateAudio();
-            } catch (err) {
-                console.warn("Permiso de cámara/audio denegado socio.");
-            }
+                timeLeft--;
+            }, 1000);
         }
 
-        // 3. CAPTURA AUTOMÁTICA DE EVIDENCIA (Cada 5 min)
-        function autoCapture() {
-            const video = document.getElementById('webcam');
-            const canvas = document.getElementById('photo-canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            console.log("📸 Evidencia tomada para el reporte del socio.");
-        }
-        setInterval(autoCapture, 300000); 
-
-        // 4. LÓGICA DE PREGUNTAS
-        async function fetchNextQuestion() {
-            document.getElementById('ia-box').classList.add('hidden');
-            document.getElementById('btn-next').classList.add('hidden');
-            
-            // Aquí filtramos dinámicamente. Puedes cambiar 'A4' por una variable según el usuario.
+        // 2. OBTENER TODAS LAS PREGUNTAS (120) AL INICIO
+        async function loadExam() {
             const { data, error } = await _supabase
                 .from('reactivos')
                 .select('*')
                 .eq('institucion', 'UNAM')
-                .eq('tipo_examen', 'A4') // Esto lo hará dinámico después
-                .order('id', { ascending: false })
-                .limit(10); // Traemos varios para sortear
+                .eq('tipo_examen', 'A4');
 
-            if (data && data.length > 0) {
-                const randomQ = data[Math.floor(Math.random() * data.length)];
-                currentQuestion = randomQ;
-                count++;
-                render(randomQ);
+            if (data) {
+                // Mezclar preguntas aleatoriamente
+                questionsBank = data.sort(() => Math.random() - 0.5).slice(0, 120);
+                document.getElementById('loader').style.display = 'none';
+                startTimer();
+                renderQuestion();
             }
         }
 
-        function render(q) {
+        function renderQuestion() {
+            const q = questionsBank[currentIndex];
             document.getElementById('txt-pregunta').innerText = q.pregunta;
             document.getElementById('badge-materia').innerText = q.materia.toUpperCase();
-            document.getElementById('badge-area').innerText = q.tipo_examen;
-            document.getElementById('current-count').innerText = count;
-            
+            document.getElementById('current-count').innerText = currentIndex + 1;
+            document.getElementById('btn-next').classList.add('hidden');
+
             const grid = document.getElementById('opciones-grid');
             grid.innerHTML = '';
 
-            Object.entries(q.opciones).forEach(([letra, texto]) => {
+            // Mezclar opciones para que no siempre la A sea la misma
+            const opcionesEntries = Object.entries(q.opciones).sort(() => Math.random() - 0.5);
+
+            opcionesEntries.forEach(([letra, texto]) => {
                 const btn = document.createElement('button');
-                btn.className = "group flex items-center p-4 bg-slate-700/30 border border-slate-600 rounded-xl hover:border-yellow-500 hover:bg-slate-700 transition-all text-left";
-                btn.innerHTML = `
-                    <span class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-900 text-yellow-500 font-bold mr-4 group-hover:bg-yellow-500 group-hover:text-slate-900">${letra}</span>
-                    <span class="text-sm">${texto}</span>
-                `;
-                btn.onclick = () => check(letra);
+                btn.className = "flex items-center p-4 bg-slate-700/30 border border-slate-600 rounded-xl hover:border-yellow-500 transition-all text-left";
+                btn.innerHTML = `<span class="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-900 text-yellow-500 font-bold mr-4">${letra}</span><span class="text-sm">${texto}</span>`;
+                btn.onclick = () => {
+                    // Seleccionar opción y mostrar botón siguiente sin feedback (Modo Examen)
+                    document.querySelectorAll('#opciones-grid button').forEach(b => b.classList.remove('border-yellow-500', 'bg-slate-700'));
+                    btn.classList.add('border-yellow-500', 'bg-slate-700');
+                    document.getElementById('btn-next').classList.remove('hidden');
+                };
                 grid.appendChild(btn);
             });
         }
 
-        function check(choice) {
-            const iaBox = document.getElementById('ia-box');
-            const iaMsg = document.getElementById('ia-feedback');
-            iaBox.classList.remove('hidden');
-            document.getElementById('btn-next').classList.remove('hidden');
-
-            if (choice === currentQuestion.respuesta_correcta) {
-                iaMsg.innerHTML = `<b class="text-green-400">¡Excelente elección!</b> ${currentQuestion.explicacion_ia}`;
+        function fetchNextQuestion() {
+            if (currentIndex < questionsBank.length - 1) {
+                currentIndex++;
+                renderQuestion();
             } else {
-                iaMsg.innerHTML = `<b class="text-red-400">Ojo aquí socio:</b> La respuesta era ${currentQuestion.respuesta_correcta}. ${currentQuestion.explicacion_ia}`;
+                finalizarExamen();
             }
         }
 
-        // Arrancar todo
-        initMedia();
-        fetchNextQuestion();
+        function abortarExamen() {
+            if(confirm("¿Seguro socio? Se perderá el progreso.")) location.reload();
+        }
+
+        function finalizarExamen() {
+            document.getElementById('quiz-card').innerHTML = `<h2 class="text-3xl text-center text-yellow-500 font-bold">Examen Finalizado</h2><p class="text-center mt-4">Procesando resultados con IA TukurForge...</p>`;
+        }
+
+        // Iniciar
+        loadExam();
+        // (Agrega tu función initMedia() aquí para la cámara)
     </script>
 </body>
 </html>
